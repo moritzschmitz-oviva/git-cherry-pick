@@ -4,7 +4,7 @@ const commentSignature = '<!-- notify-commit-author.js -->';
 
 module.exports = async ({github, context, commits}) => {
     // Create message
-    const messageHeader = `${commentSignature}\n${context.actor}, please consider cherry-picking these commits into 'origin/main':\n`;
+    const messageHeader = `${commentSignature}\n@${context.actor}, please consider cherry-picking these commits into 'origin/main':\n`;
     const message = commits
         .split(' ')
         .reduce((str, commit) => `${str}${commit}\n`, messageHeader);
