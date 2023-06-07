@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: write
+      contents: write # Requires write permissions to receive `allow_squash_merge` and `allow_rebase_merge` keys in repository request
 
     steps:
       - name: Verify Repo Settings
@@ -22,7 +22,6 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
             });
-            console.log(data);
             if (data.allow_squash_merge != false || data.allow_rebase_merge != false) {
               core.setFailed('Neither "allow_squash_merge" nor "allow_rebase_merge" must be allowed!');
             }
@@ -54,7 +53,7 @@ jobs:
         with:
           script: |
             const notifyCommitAuthor = require('.github/scripts/notify-commit-author.js');
-            await notifyCommitAuthor({ github, context, commits: '${{ steps.commits.outputs.commits }}' });
+            await notifyCommitAuthor({ github, context, commits: '${{ steps.diff.outputs.commits }}' });
 
       - name: Fail Build
         if: ${{ steps.diff.outputs.commits != '' }}
