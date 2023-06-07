@@ -18,13 +18,11 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const response = await github.rest.repos.get({
+            const { data } = await github.rest.repos.get({
               owner: context.repo.owner,
               repo: context.repo.repo,
             });
-            const data = response.data;
-            console.log(data);
-            if (data.allow_squash_merge || data.allow_rebase_merge) {
+            if (data.allow_squash_merge != false || data.allow_rebase_merge != false) {
               core.setFailed('Neither "allow_squash_merge" nor "allow_rebase_merge" must be allowed!');
             }
 
@@ -55,7 +53,7 @@ jobs:
         with:
           script: |
             const notifyCommitAuthor = require('.github/scripts/notify-commit-author.js');
-            await notifyCommitAuthor({ github, context, '${{ steps.commits.outputs.commits }}' });
+            await notifyCommitAuthor({ github, context, commits: '${{ steps.commits.outputs.commits }}' });
 
       - name: Fail Build
         if: ${{ steps.diff.outputs.commits != '' }}
