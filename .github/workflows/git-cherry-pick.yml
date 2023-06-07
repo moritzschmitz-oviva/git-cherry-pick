@@ -22,6 +22,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
             });
+            console.log(data);
             if (data.allow_squash_merge != false || data.allow_rebase_merge != false) {
               core.setFailed('Neither "allow_squash_merge" nor "allow_rebase_merge" must be allowed!');
             }
