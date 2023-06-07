@@ -3,7 +3,7 @@ name: Git Cherry Pick
 on:
   pull_request:
     branches:
-      - hotfix/*
+      - hotfix/**
 
 jobs:
   verify-repo-settings:
