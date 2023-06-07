@@ -7,7 +7,6 @@ on:
 
 jobs:
   verify-repo-settings:
-    if: ${{ contains(github.base_ref, 'release/') }}
     name: Verify Repo Settings
     runs-on: ubuntu-latest
 
@@ -28,7 +27,6 @@ jobs:
             }
 
   git-cherry-pick:
-    if: ${{ contains(github.base_ref, 'release/') }}
     name: Git Cherry Pick
     runs-on: ubuntu-latest
 
