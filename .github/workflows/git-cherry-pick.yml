@@ -18,10 +18,12 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const { data } = await github.rest.repos.get({
+            const response = await github.rest.repos.get({
               owner: context.repo.owner,
               repo: context.repo.repo,
             });
+            const data = response.data;
+            console.log(data);
             if (data.allow_squash_merge || data.allow_rebase_merge) {
               core.setFailed('Neither "allow_squash_merge" nor "allow_rebase_merge" must be allowed!');
             }
@@ -48,7 +50,7 @@ jobs:
         run: echo "commits=$(git cherry -v origin/main | awk '{ print $2 }' | tr '\n' ' ')" >> $GITHUB_OUTPUT
 
       - name: Notify Commit Author
-        if: ${{ steps.commits.outputs.commits != '' }}
+        if: ${{ steps.diff.outputs.commits != '' }}
         uses: actions/github-script@v6
         with:
           script: |
@@ -56,5 +58,5 @@ jobs:
             await notifyCommitAuthor({ github, context, '${{ steps.commits.outputs.commits }}' });
 
       - name: Fail Build
-        if: ${{ steps.commits.outputs.commits != '' }}
+        if: ${{ steps.diff.outputs.commits != '' }}
         run: exit 1
