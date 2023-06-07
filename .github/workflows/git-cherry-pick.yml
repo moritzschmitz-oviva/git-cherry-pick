@@ -1,0 +1,61 @@
+name: Git Cherry Pick
+
+on:
+  pull_request:
+    branches:
+      - hotfix/*
+
+jobs:
+  verify-repo-settings:
+    if: ${{ contains(github.base_ref, 'release/') }}
+    name: Verify Repo Settings
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Verify Repo Settings
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { data } = await github.rest.repos.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            if (data.allow_squash_merge || data.allow_rebase_merge) {
+              core.setFailed('Neither "allow_squash_merge" nor "allow_rebase_merge" must be allowed!');
+            }
+
+  git-cherry-pick:
+    if: ${{ contains(github.base_ref, 'release/') }}
+    name: Git Cherry Pick
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pull-requests: write
+
+    needs:
+      - verify-repo-settings
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Collect Difference
+        id: diff
+        run: echo "commits=$(git cherry -v origin/main | awk '{ print $2 }' | tr '\n' ' ')" >> $GITHUB_OUTPUT
+
+      - name: Notify Commit Author
+        if: ${{ steps.commits.outputs.commits != '' }}
+        uses: actions/github-script@v6
+        run: |
+          const notifyCommitAuthor = require('.github/scripts/notify-commit-author.js');
+          await notifyCommitAuthor({ github, context, '${{ steps.commits.outputs.commits }}' });
+
+      - name: Fail Build
+        if: ${{ steps.commits.outputs.commits != '' }}
+        run: exit 1
