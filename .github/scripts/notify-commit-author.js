@@ -5,7 +5,7 @@ const commentSignature = '<!-- notify-commit-author.js -->';
 module.exports = async ({github, context, commits}) => {
     // Create message
     const messageHeader = `${commentSignature}\n@${context.actor}, please consider cherry-picking these commits into 'origin/main':\n`;
-    const message = messageHeader + '```\ngit checkout main \\\n  && git pull \\\n  && git cherry-pick ' + commits + '\n```';
+    const message = messageHeader + '```\ngit checkout main \\\n  && git pull \\\n  && git cherry-pick ' + commits + '\\\n  && git push origin main\n```';
 
     // Get the latest comment, if any
     const {data: comments} = await github.rest.issues.listComments({
