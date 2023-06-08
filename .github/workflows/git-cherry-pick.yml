@@ -52,8 +52,16 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const notifyCommitAuthor = require('.github/scripts/notify-commit-author.js');
-            await notifyCommitAuthor({ github, context, commits: '${{ steps.diff.outputs.commits }}' });
+            const utility = require('.github/scripts/utility.js');
+            await utility.notifyCommitAuthor({ github, context, commits: '${{ steps.diff.outputs.commits }}' });
+
+      - name: Delete Comment
+        if: ${{ steps.diff.outputs.commits == '' }}
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const utility = require('.github/scripts/utility.js');
+            await utility.deleteComment({ github, context });
 
       - name: Fail Build
         if: ${{ steps.diff.outputs.commits != '' }}
