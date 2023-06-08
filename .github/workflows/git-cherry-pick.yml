@@ -45,7 +45,7 @@ jobs:
 
       - name: Collect Difference
         id: diff
-        run: echo "commits=$(git cherry -v origin/main | awk '{ print $2 }' | tr '\n' ' ')" >> $GITHUB_OUTPUT
+        run: echo "commits=$(git log --cherry-pick --right-only --pretty=oneline origin/main...${{ github.head_ref }} | awk '{ print $1 }' | tr '\n' ' ')" >> $GITHUB_OUTPUT
 
       - name: Notify Commit Author
         if: ${{ steps.diff.outputs.commits != '' }}
