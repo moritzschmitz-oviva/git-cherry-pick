@@ -1,0 +1,18 @@
+name: Enable Branch Protection
+
+on:
+  - push
+  - workflow_dispatch
+
+jobs:
+  enable-branch-protection:
+    name: Enable Branch Protection
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - name: Enable Branch Protection
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const enableBranchProtection = require('.github/scripts/enable-branch-protection.js');
+            await enableBranchProtection({ github, context });
