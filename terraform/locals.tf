@@ -16,7 +16,9 @@ locals {
     if contains([for rule in repository.rules : rule.pattern], "main")
     && contains([for rule in repository.rules : rule.pattern], "release/*")
   ]
-  is_missing_branch_protection = setsubtract(local.is_using_greeter_template, [
-    for repository in local.has_branch_protection_complete : "${var.owner}/${repository.repository}"
-  ])
+  is_missing_branch_protection = [
+    for name in setsubtract(local.is_using_greeter_template, [
+      for repository in local.has_branch_protection_complete : repository.repository
+    ]) : "${var.owner}/${name}"
+  ]
 }
